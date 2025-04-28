@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: joget
+  labels: 
+    app: joget
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: joget
+  template:
+    metadata:
+      labels: 
+        app: joget
+      annotations:
+        kubectl.kubernetes.io/restartedAt: '2024-01-23T10:00:00Z'
+    spec:
+      nodeSelector:            
+        kubernetes.io/hostname: worker1
+      volumes:
+        - name: joget-pv
+          persistentVolumeClaim:
+            claimName: joget-pvc
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 0
+      containers:
+        - name: joget
+          image: motrabelsi10/joget-wevioo-k8s:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: joget-pv
+              mountPath: /opt/joget/wflow
+          env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: DB_JDBC_URL
+              value: "jdbc:mysql://10.36.1.69:3306/jwdb"
+            - name: DB_JDBC_USER
+              value: "tomcat"
+            - name: DB_JDBC_PASSWORD
+              value: "tomcat"
+            - name: TOMCAT_SESSION_JDBC_URL
+              value: "jdbc:mysql://10.36.1.69:3306/tomcat?user=tomcat&password=tomcat"
+            - name: DB_JDBC_DRIVER
+              value: "com.mysql.cj.jdbc.Driver"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: joget
+  labels:
+    app: joget
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      nodePort: 32325
+    - name: https
+      port: 9080
+      targetPort: 9080
+  selector:
+    app: joget
+  type: NodePort
+  sessionAffinity: ClientIP
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: joget-clusterrolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: default
