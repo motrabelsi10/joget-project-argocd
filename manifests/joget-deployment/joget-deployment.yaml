@@ -68,7 +68,7 @@ spec:
   selector:
     app: joget
   type: NodePort
-  sessionAffinity: ClientIP
+  sessionAffinity: None
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
