@@ -5,7 +5,7 @@ metadata:
   labels: 
     app: joget
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: joget
@@ -27,7 +27,7 @@ spec:
         fsGroup: 0
       containers:
         - name: joget
-          image: motrabelsi10/joget-wevioo-k8s:latest
+          image: motrabelsi10/joget-v7:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
@@ -40,13 +40,13 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             - name: DB_JDBC_URL
-              value: "jdbc:mysql://10.36.1.69:3306/jwdb"
+              value: "jdbc:mysql://10.36.0.0:3306/jwdb"
             - name: DB_JDBC_USER
               value: "tomcat"
             - name: DB_JDBC_PASSWORD
               value: "tomcat"
             - name: TOMCAT_SESSION_JDBC_URL
-              value: "jdbc:mysql://10.36.1.69:3306/tomcat?user=tomcat&password=tomcat"
+              value: "jdbc:mysql://10.36.0.0:3306/tomcat?user=tomcat&password=tomcat"
             - name: DB_JDBC_DRIVER
               value: "com.mysql.cj.jdbc.Driver"
 ---

@@ -6,7 +6,9 @@ spec:
   capacity:
     storage: 2Gi
   accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/mnt/data/mysql"
+    - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /exports/mysql
+    server: 192.168.193.141
+
